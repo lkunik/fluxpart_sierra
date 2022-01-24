@@ -47,13 +47,31 @@ for(site in site.list){
     iyear <- which(site.files %in% file)
     colnames(E0_annual)[iyear] <- toString(year)
     
-    #get number of days 
-    dat.DoY_windows <- seq(from = min(dat$DoY, na.rm=T) + window_buff,
-                           to = max(dat$DoY, na.rm=T) - window_buff)
     
     # now filter data for nighttime only data
     dat.night <- dat %>%
       filter(daynight == "night")
+    
+    
+    
+    ### TO-DO:
+    # Do weekly averaging here
+    # think about gaps and how the weekly averaging would affect things
+    
+    dat.night %<>%
+      mutate(Week = lubridate::week(posix_time)) %>%
+      relocate(Week, .after = Year)
+    
+    weekly.df <- dat.night %>% 
+      group_by(Week) %>%
+      summarize_all(mean, na.rm = T)
+    
+    
+    #### TODO: figure out a fix for this!!!!
+    
+    mod05 <- minpack.lm::nlsLM(weekly.df$NEE_U05_f[1] ~ fNight_Reichstein(Temp = weekly.df$Tair_K[1], Rref, Tref = Tref_K,
+                                                                          T0 = T0_K, E0), start = list(Rref = 1, E0 = 100), model = TRUE)
+    
     
     # Set up empty vectors for E0, Rref to be filled in the next for-loop
     E0_v_U05 <- rep(NA, ndays)
