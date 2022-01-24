@@ -31,19 +31,19 @@ names(files.list) <- site.list
 
 # Loop through each site
 for(site in site.list){
-  
+
   message(paste0(site, ":"))
   site.files <- files.list[[site]] #get files corresponding to this site
   site.df <- data.frame() %>% as_tibble()
-  
+
   for(file in site.files){
-    
+
     flux.df <- readRDS(file)
     site.df %<>%
       bind_rows(flux.df)
-    
+
   }
-  
+
   # Create out of bounds (OOB) columns in site.df
   E0_min <- -500
   E0_max <- 500
@@ -52,11 +52,11 @@ for(site in site.list){
   E0_OOB[E0_OOB <= E0_min] <- E0_min + 0.0001
   E0_OOB[E0_OOB >= E0_max] <- E0_max - 0.0001
   site.df %<>% mutate(E0_U50_OOB = E0_OOB)
-  
+
   perc_E0_NA <- round(length(which(is.na(site.df$E0_U50)))*100/length(site.df$E0_U50), 2)
   message(paste0(perc_E0_NA, "% of all E0 daily values are NA"))
 
-  
+
   ### Plot E0
   ylims <- c(max(min(site.df$E0_U50, na.rm = T), -500), min(max(site.df$E0_U50, na.rm = T), 500))
   # plot data
@@ -70,12 +70,12 @@ for(site in site.list){
     ylab("") +
     ggtitle(site)
   grob.list.E0[[site]] <- grob #assign to the corresponding list of ggplot objects ("grobs")
-  
+
   ### Plot Rref
 
   perc_Rref_NA <- round(length(which(is.na(site.df$Rref_U50)))*100/length(site.df$Rref_U50), 2)
   message(paste0(perc_Rref_NA, "% of all Rref daily values are NA\n"))
-  
+
   # Create out of bounds (OOB) column in site.df
   Rref_min <- -50
   Rref_max <- 50
@@ -84,7 +84,7 @@ for(site in site.list){
   Rref_OOB[Rref_OOB <= Rref_min] <- Rref_min + 0.0001
   Rref_OOB[Rref_OOB >= Rref_max] <- Rref_max - 0.0001
   site.df %<>% mutate(Rref_U50_OOB = Rref_OOB)
-  
+
   ylims <- c(max(min(site.df$Rref_U50, na.rm = T), Rref_min), min(max(site.df$Rref_U50, na.rm = T), Rref_max))
   # plot data
   grob <- site.df %>% # take data
@@ -97,10 +97,10 @@ for(site in site.list){
     ylab("") +
     ggtitle(site)
   grob.list.Rref[[site]] <- grob #assign to the corresponding list of ggplot objects ("grobs")
-  
-  
+
+
   ### Plot NEE
-  
+
   NEE_min <- -20
   NEE_max <- 20
   NEE_OOB <- (site.df %>% filter(daynight == "night"))$NEE_U50_f
@@ -110,7 +110,7 @@ for(site in site.list){
   site.df %<>% filter(daynight == "night") %>%
     mutate(NEE_U50_OOB = NEE_OOB) %>%
     filter(NEE_U50_fqc < 2)
-  
+
   ylims <- c(NEE_min, NEE_max)
   # plot data
   grob <- site.df %>% # take data
@@ -124,10 +124,10 @@ for(site in site.list){
     ylab("") +
     ggtitle(site)
   grob.list.NEE[[site]] <- grob #assign to the corresponding list of ggplot objects ("grobs")
-  
-  
+
+
   ### Plot Tair
-  
+
   Tair_min <- -20
   Tair_max <- 35
   Tair_OOB <- (site.df %>% filter(daynight == "night"))$Tair_f
@@ -137,7 +137,7 @@ for(site in site.list){
   site.df %<>% filter(daynight == "night") %>%
     mutate(Tair_OOB = Tair_OOB) %>%
     filter(Tair_fqc < 2)
-  
+
   ylims <- c(Tair_min, Tair_max)
   # plot data
   grob <- site.df %>% # take data
@@ -151,8 +151,8 @@ for(site in site.list){
     ylab("") +
     ggtitle(site)
   grob.list.Tair[[site]] <- grob #assign to the corresponding list of ggplot objects ("grobs")
-  
-  
+
+
 } #end sites for-loop
 
 gridRows <- ceiling(length(site.list)/2)
@@ -162,16 +162,6 @@ gridCols <- 2
 ### make multi-panel plot of E0 v time for all sites
 main.title <- "E0, All available years, 50% u* threshold"
 yaxis.lab <-  "[Kelvin]" #units are K
-
-message("Printing multi-panel E0 plot to PDF")
-
-#print PDF
-pdf_outfile <- paste0(plot.dir, "E0_all_sites_all_years.pdf") #define plot filename
-pdf(pdf_outfile, width = 12, height = 16) #open pdf
-grid.arrange(grobs = grob.list.E0, nrow = gridRows, ncols = gridCols,
-             top = textGrob(main.title, gp = gpar(fontsize = 20)),
-             left = textGrob(yaxis.lab, gp = gpar(fontsize = 20), rot = 90))
-dev.off() #close pdf
 
 #print PNG
 message("Printing multi-panel E0 plot to PNG")
@@ -191,14 +181,6 @@ yaxis.lab <-  "[umol m-2 s-1]" #units are K
 
 message("Printing multi-panel Rref plot to PDF")
 
-#print PDF
-pdf_outfile <- paste0(plot.dir, "Rref_all_sites_all_years.pdf") #define plot filename
-pdf(pdf_outfile, width = 12, height = 16) #open pdf
-grid.arrange(grobs = grob.list.Rref, nrow = gridRows, ncols = gridCols,
-             top = textGrob(main.title, gp = gpar(fontsize = 20)),
-             left = textGrob(yaxis.lab, gp = gpar(fontsize = 20), rot = 90))
-dev.off() #close pdf
-
 #print PNG
 
 message("Printing multi-panel Rref plot to PNG")
@@ -215,18 +197,7 @@ dev.off() #close pdf
 main.title <- "Nighttime NEE (PPFD < 5), All available years, 50% u* threshold"
 yaxis.lab <-  "[umol m-2 s-1]" #units are K
 
-message("Printing multi-panel NEE plot to PDF")
-
-#print PDF
-pdf_outfile <- paste0(plot.dir, "NEE_night_all_sites_all_years.pdf") #define plot filename
-pdf(pdf_outfile, width = 12, height = 16) #open pdf
-grid.arrange(grobs = grob.list.NEE, nrow = gridRows, ncols = gridCols,
-             top = textGrob(main.title, gp = gpar(fontsize = 20)),
-             left = textGrob(yaxis.lab, gp = gpar(fontsize = 20), rot = 90))
-dev.off() #close pdf
-
 #print PNG
-
 message("Printing multi-panel NEE plot to PNG")
 
 png_outfile <- paste0(plot.dir, "NEE_night_all_sites_all_years.png") #define plot filename
@@ -244,14 +215,6 @@ main.title <- "Nighttime Tair (PPFD < 5), All available years, 50% u* threshold"
 yaxis.lab <-  "[°Celsius]" #units are deg C
 
 message("Printing multi-panel Tair plot to PDF")
-
-#print PDF
-pdf_outfile <- paste0(plot.dir, "Tair_night_all_sites_all_years.pdf") #define plot filename
-pdf(pdf_outfile, width = 12, height = 16) #open pdf
-grid.arrange(grobs = grob.list.Tair, nrow = gridRows, ncols = gridCols,
-             top = textGrob(main.title, gp = gpar(fontsize = 20)),
-             left = textGrob(yaxis.lab, gp = gpar(fontsize = 20), rot = 90))
-dev.off() #close pdf
 
 #print PNG
 
