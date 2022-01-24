@@ -1,0 +1,4 @@
+# add all filepaths here that you don't want to upload to github
+data/*.rds
+data/E0/*.rds
+plots/*
