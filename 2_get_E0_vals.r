@@ -16,7 +16,7 @@ window.vars <- c("posix_time", "DoY", "Tair_K", "PPFD", "NEE_U05_f", "NEE_U50_f"
                  "NEE_U95_f", "AMT_K", "AMNT_K")
 
 # robustness parameters
-window_buff <- floor(length_window_days_pass1/2) #+/- number of days from center day to form moving window
+window_buff <- floor(length_window_days_pass1/7/2) #+/- number of days from center day to form moving window
 
 #########################################
 # Begin main
@@ -47,6 +47,9 @@ for(site in site.list){
     iyear <- which(site.files %in% file)
     colnames(E0_annual)[iyear] <- toString(year)
     
+    # Define the Day of Year windows based on length of moving window
+    dat.WoY_windows <- seq(from = min(dat$DoY, na.rm=T) + window_buff,
+                           to = max(dat$DoY, na.rm=T) - window_buff)
     
     # now filter data for nighttime only data
     dat.night <- dat %>%
@@ -65,12 +68,6 @@ for(site in site.list){
     weekly.df <- dat.night %>% 
       group_by(Week) %>%
       summarize_all(mean, na.rm = T)
-    
-    
-    #### TODO: figure out a fix for this!!!!
-    
-    mod05 <- minpack.lm::nlsLM(weekly.df$NEE_U05_f[1] ~ fNight_Reichstein(Temp = weekly.df$Tair_K[1], Rref, Tref = Tref_K,
-                                                                          T0 = T0_K, E0), start = list(Rref = 1, E0 = 100), model = TRUE)
     
     
     # Set up empty vectors for E0, Rref to be filled in the next for-loop
