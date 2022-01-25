@@ -91,6 +91,7 @@ T0_K <- 273.15 - 46.02 #T0 is set to -46.02°C (Lloyd & Taylor, 1994)
 #Tref_K <- 273.15 + 5 # +5°C. Note, different from Wutzler et al 2018 (15°C) and Reichstein et al 2005 (10°C)
 
 ndays <- 366 # maximum number of days in year
+nweeks <- 52 # number of weeks in year
 
 #### Fit routine (determination of E0 and Rref) params
 length_window_days_pass1 <- 15 #length of moving window during first pass of fit routine
