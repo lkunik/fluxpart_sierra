@@ -165,6 +165,9 @@ for(site in site.list){
       dat <- dat %>%
         mutate(Reco_U05 = fNight_Reichstein(Tair_K, Rref_U05, Tref_K, T0_K, E0_U05),
                GPP_U05_f = -1 * (NEE_U05_f - Reco_U05))
+        iNight <- which(dat$daynight == "night")
+        dat$GPP_U05_f[iNight] <- 0
+        dat$Reco_U05[iNight] <- dat$NEE_U05_f[iNight]
     }
     
     ### 50% u* threshold
@@ -177,6 +180,9 @@ for(site in site.list){
       dat <- dat %>%
         mutate(Reco_U50 = fNight_Reichstein(Tair_K, Rref_U50, Tref_K, T0_K, E0_U50),
                GPP_U50_f = -1 * (NEE_U50_f - Reco_U50))
+      iNight <- which(dat$daynight == "night")
+      dat$GPP_U50_f[iNight] <- 0
+      dat$Reco_U50[iNight] <- dat$NEE_U50_f[iNight]
     }
     
     ### 95% u* threshold
@@ -189,6 +195,9 @@ for(site in site.list){
       dat <- dat %>%
         mutate(Reco_U95 = fNight_Reichstein(Tair_K, Rref_U95, Tref_K, T0_K, E0_U95),
                GPP_U95_f = -1 * (NEE_U95_f - Reco_U95))
+      iNight <- which(dat$daynight == "night")
+      dat$GPP_U95_f[iNight] <- 0
+      dat$Reco_U95[iNight] <- dat$NEE_U95_f[iNight]
     }
 
     

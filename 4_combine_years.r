@@ -38,6 +38,12 @@ for(site in site.list){
     
   }
   
+  year1 <- head(site.df$Year, 1)
+  yearn <- tail(site.df$Year, 1)
+  filename <- paste0(data.case, site, "_flux_part_", year1, "-", yearn, "_df.rds")
+  saveRDS(site.df, filename)
+  
+  
   summary.df <- site.df %>%
     mutate(Week = lubridate::week(posix_time),
            YearWeek = paste(lubridate::year(posix_time), Week, sep = "_")) %>% #get week of year
@@ -83,10 +89,12 @@ for(site in site.list){
   # NEE, weekly GPP, weekly Reco
   grob <- site.df %>% # take data
     ggplot() + theme_FS() + # pipe in ggplot call
-    geom_point(aes(x=posix_time, y=NEE_U50_f), size=0.5, color = "gray50") + # plot NEE vs time
+    #geom_point(aes(x=posix_time, y=NEE_U50_f), size=0.5, color = "gray50") + # plot NEE vs time
     geom_point(data = weekly.df, aes(x=mean_posix, y=weekly_GPP),  size = 0.75, color = "red") + # add GPP vs time
+    geom_line(data = weekly.df, aes(x=mean_posix, y=weekly_GPP), size = 0.75, color = "red") + # add GPP vs time
     geom_point(data = weekly.df, aes(x=mean_posix, y=weekly_Reco), size = 0.75, color = "blue") + # add GPP vs time
-    ylim(ylims) +
+    geom_line(data = weekly.df, aes(x=mean_posix, y=weekly_Reco), size = 0.75, color = "blue") + # add GPP vs time
+    ylim(c(-1, 6)) +
     xlab("") + scale_x_datetime(labels = label_date("%b %Y")) +
     ylab("[umol m-2 s-1]") +
     ggtitle(site)
