@@ -83,7 +83,7 @@ NWR_years <- c(2005, 2006, 2007)
 # reference and base temperatures outside of all loops:
 #Tref_K <- 273.15 + 5 # +5°C. Note, different from Wutzler et al 2018 (15°C) and Reichstein et al 2005 (10°C)
 
-night_PPFD_thresh <- 10 #umol/m2/ms
+night_PPFD_thresh <- 5 #umol/m2/ms
 gf_flag_thresh <- 2 #QC threshold for retaining gap-filled data (NEE*_fqc must be LESS THAN (not ≤) threshold value)
 
 T0_K <- 273.15 - 46.02 #T0 is set to -46.02°C (Lloyd & Taylor, 1994)
