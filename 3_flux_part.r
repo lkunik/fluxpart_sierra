@@ -147,6 +147,11 @@ for(site in site.list){
       }
       
     } #end rolling 7-day window for-loop
+
+    #When Rref is less than zero, set it to zero
+    Rref_v_U05 = replace(Rref_v_U05, Rref_v_U05 < 0, 0) 
+    Rref_v_U50 = replace(Rref_v_U50, Rref_v_U50 < 0, 0)
+    Rref_v_U95 = replace(Rref_v_U95, Rref_v_U95 < 0, 0)
     
     # Apply the daily Rref and E0 values to the main dataset; calculate Reco and GPP
     message(paste0("Calculating Reco and GPP for file: ", file))
@@ -165,9 +170,12 @@ for(site in site.list){
       dat <- dat %>%
         mutate(Reco_U05 = fNight_Reichstein(Tair_K, Rref_U05, Tref_K, T0_K, E0_U05),
                GPP_U05_f = -1 * (NEE_U05_f - Reco_U05))
-        iNight <- which(dat$daynight == "night")
-        dat$GPP_U05_f[iNight] <- 0
-        dat$Reco_U05[iNight] <- dat$NEE_U05_f[iNight]
+        #iNight <- which(dat$daynight == "night")
+        #dat$GPP_U05_f[iNight] <- 0
+        #dat$Reco_U05[iNight] <- dat$NEE_U05_f[iNight]
+      inegGPP <- which(dat$GPP_U05_f < 0)
+      dat$GPP_U05_f[inegGPP] <- 0
+      dat$Reco_U05[inegGPP] <- dat$NEE_U05_f[inegGPP]
     }
     
     ### 50% u* threshold
@@ -180,9 +188,12 @@ for(site in site.list){
       dat <- dat %>%
         mutate(Reco_U50 = fNight_Reichstein(Tair_K, Rref_U50, Tref_K, T0_K, E0_U50),
                GPP_U50_f = -1 * (NEE_U50_f - Reco_U50))
-      iNight <- which(dat$daynight == "night")
-      dat$GPP_U50_f[iNight] <- 0
-      dat$Reco_U50[iNight] <- dat$NEE_U50_f[iNight]
+      #iNight <- which(dat$daynight == "night")
+      #$GPP_U50_f[iNight] <- 0
+      #dat$Reco_U50[iNight] <- dat$NEE_U50_f[iNight]
+      inegGPP <- which(dat$GPP_U50_f < 0)
+      dat$GPP_U50_f[inegGPP] <- 0
+      dat$Reco_U50[inegGPP] <- dat$NEE_U50_f[inegGPP]
     }
     
     ### 95% u* threshold
@@ -195,9 +206,12 @@ for(site in site.list){
       dat <- dat %>%
         mutate(Reco_U95 = fNight_Reichstein(Tair_K, Rref_U95, Tref_K, T0_K, E0_U95),
                GPP_U95_f = -1 * (NEE_U95_f - Reco_U95))
-      iNight <- which(dat$daynight == "night")
-      dat$GPP_U95_f[iNight] <- 0
-      dat$Reco_U95[iNight] <- dat$NEE_U95_f[iNight]
+      #iNight <- which(dat$daynight == "night")
+      #dat$GPP_U95_f[iNight] <- 0
+      #dat$Reco_U95[iNight] <- dat$NEE_U95_f[iNight]
+      inegGPP <- which(dat$GPP_U95_f < 0)
+      dat$GPP_U95_f[inegGPP] <- 0
+      dat$Reco_U95[inegGPP] <- dat$NEE_U95_f[inegGPP]
     }
 
     

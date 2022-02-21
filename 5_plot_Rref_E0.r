@@ -214,7 +214,7 @@ dev.off() #close pdf
 main.title <- "Nighttime Tair (PPFD < 5), All available years, 50% u* threshold"
 yaxis.lab <-  "[°Celsius]" #units are deg C
 
-message("Printing multi-panel Tair plot to PDF")
+#message("Printing multi-panel Tair plot to PDF")
 
 #print PNG
 

@@ -23,7 +23,6 @@ files.list <- lapply(site.list, FUN = function(x) list.files(data.case, pattern 
                      full.names = T))
 names(files.list) <- site.list
 
-
 # Loop through each site
 for(site in site.list){
   
@@ -31,16 +30,17 @@ for(site in site.list){
   site.df <- data.frame() %>% as_tibble()
   
   for(file in site.files){
-    
+    #if its a summary file, skip it
+    if(grepl("part_s", file))
+      next
     flux.df <- readRDS(file)
     site.df %<>%
       bind_rows(flux.df)
-    
   }
   
   year1 <- head(site.df$Year, 1)
   yearn <- tail(site.df$Year, 1)
-  filename <- paste0(data.case, site, "_flux_part_", year1, "-", yearn, "_df.rds")
+  filename <- paste0(data.case, site, "_flux_part_s", year1, "-", yearn, "_df.rds")
   saveRDS(site.df, filename)
   
   
@@ -58,11 +58,19 @@ for(site in site.list){
   
   # get weekly avg NEE
   weekly.df <- summary.df %>%
+    #filter(Hour > 10 & Hour < 14) %>%
+    #filter(daynight == "night") %>%
+    group_by(YearWeek) %>%
+    summarise_at(vars(NEE_U50_f), list(weekly_NEE = mean)) %>% 
+    left_join(weekly.df, by = "YearWeek")
+  
+  # get weekly avg GPP
+  weekly.df <- summary.df %>%
     group_by(YearWeek) %>%
     summarise_at(vars(GPP_U50_f), list(weekly_GPP = mean)) %>% 
     left_join(weekly.df, by = "YearWeek")
   
-  # get weekly avg nighttime NEE
+  # get weekly avg Reco
   weekly.df <- summary.df %>%
     group_by(YearWeek) %>%
     summarise_at(vars(Reco_U50), list(weekly_Reco = mean)) %>% 
@@ -89,12 +97,13 @@ for(site in site.list){
   # NEE, weekly GPP, weekly Reco
   grob <- site.df %>% # take data
     ggplot() + theme_FS() + # pipe in ggplot call
-    #geom_point(aes(x=posix_time, y=NEE_U50_f), size=0.5, color = "gray50") + # plot NEE vs time
-    geom_point(data = weekly.df, aes(x=mean_posix, y=weekly_GPP),  size = 0.75, color = "red") + # add GPP vs time
-    geom_line(data = weekly.df, aes(x=mean_posix, y=weekly_GPP), size = 0.75, color = "red") + # add GPP vs time
-    geom_point(data = weekly.df, aes(x=mean_posix, y=weekly_Reco), size = 0.75, color = "blue") + # add GPP vs time
-    geom_line(data = weekly.df, aes(x=mean_posix, y=weekly_Reco), size = 0.75, color = "blue") + # add GPP vs time
-    ylim(c(-1, 6)) +
+    geom_point(data = weekly.df, aes(x=mean_posix, y=weekly_NEE),  size = 0.75, color = "gray50") + # add NEE vs time
+    geom_line(data = weekly.df, aes(x=mean_posix, y=weekly_NEE), size = 0.75, color = "gray50") + # add NEE vs time
+    geom_point(data = weekly.df, aes(x=mean_posix, y=weekly_GPP),  size = 0.75, color = "red", alpha = 0.5) + # add GPP vs time
+    geom_line(data = weekly.df, aes(x=mean_posix, y=weekly_GPP), size = 0.75, color = "red", alpha = 0.5) + # add GPP vs time
+    geom_point(data = weekly.df, aes(x=mean_posix, y=weekly_Reco), size = 0.75, color = "blue", alpha = 0.5) + # add Reco vs time
+    geom_line(data = weekly.df, aes(x=mean_posix, y=weekly_Reco), size = 0.75, color = "blue", alpha = 0.5) + # add Reco vs time
+    ylim(c(-6, 6)) +
     xlab("") + scale_x_datetime(labels = label_date("%b %Y")) +
     ylab("[umol m-2 s-1]") +
     ggtitle(site)
@@ -125,6 +134,9 @@ png(png_outfile, width = 800, height = 1000) #open pdf
 grid.arrange(grobs = grob.list.all, nrow = gridRows, ncols = gridCols,
              top = textGrob(main.title, gp = gpar(fontsize = 20)))
 dev.off() #close pdf
+
+
+main.title <- "NEE (gray) & calculated GPP (red), Reco (blue), All available years, 50% u* threshold"
 
 # HH NEE, weekly GPP, weekly Reco
 png_outfile <- paste0(plot.dir, "flux_all_sites_all_years_weekly.png") #define plot filename
