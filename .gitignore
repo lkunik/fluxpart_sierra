@@ -4,3 +4,4 @@ data/E0/*.rds
 plots/*
 .Rhistory
 .RDataTmp
+8*.r

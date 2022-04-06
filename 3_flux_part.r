@@ -149,6 +149,8 @@ for(site in site.list){
     } #end rolling 7-day window for-loop
 
     #When Rref is less than zero, set it to zero
+    ## IMPORTANT: SKIP FOR NOW!
+    ## TODO: uncomment if you wish to set all negative GPP to zero
     Rref_v_U05 = replace(Rref_v_U05, Rref_v_U05 < 0, 0) 
     Rref_v_U50 = replace(Rref_v_U50, Rref_v_U50 < 0, 0)
     Rref_v_U95 = replace(Rref_v_U95, Rref_v_U95 < 0, 0)
@@ -173,9 +175,11 @@ for(site in site.list){
         #iNight <- which(dat$daynight == "night")
         #dat$GPP_U05_f[iNight] <- 0
         #dat$Reco_U05[iNight] <- dat$NEE_U05_f[iNight]
-      inegGPP <- which(dat$GPP_U05_f < 0)
-      dat$GPP_U05_f[inegGPP] <- 0
-      dat$Reco_U05[inegGPP] <- dat$NEE_U05_f[inegGPP]
+      
+      ## TODO: uncomment if you wish to set all negative GPP to zero
+      # inegGPP <- which(dat$GPP_U05_f < 0)
+      # dat$GPP_U05_f[inegGPP] <- 0
+      # dat$Reco_U05[inegGPP] <- dat$NEE_U05_f[inegGPP]
     }
     
     ### 50% u* threshold
@@ -191,9 +195,11 @@ for(site in site.list){
       #iNight <- which(dat$daynight == "night")
       #$GPP_U50_f[iNight] <- 0
       #dat$Reco_U50[iNight] <- dat$NEE_U50_f[iNight]
-      inegGPP <- which(dat$GPP_U50_f < 0)
-      dat$GPP_U50_f[inegGPP] <- 0
-      dat$Reco_U50[inegGPP] <- dat$NEE_U50_f[inegGPP]
+      
+      ## TODO: uncomment if you wish to set all negative GPP to zero
+      # inegGPP <- which(dat$GPP_U50_f < 0)
+      # dat$GPP_U50_f[inegGPP] <- 0
+      # dat$Reco_U50[inegGPP] <- dat$NEE_U50_f[inegGPP]
     }
     
     ### 95% u* threshold
@@ -209,9 +215,11 @@ for(site in site.list){
       #iNight <- which(dat$daynight == "night")
       #dat$GPP_U95_f[iNight] <- 0
       #dat$Reco_U95[iNight] <- dat$NEE_U95_f[iNight]
-      inegGPP <- which(dat$GPP_U95_f < 0)
-      dat$GPP_U95_f[inegGPP] <- 0
-      dat$Reco_U95[inegGPP] <- dat$NEE_U95_f[inegGPP]
+      
+      ## TODO: uncomment if you wish to set all negative GPP to zero
+      # inegGPP <- which(dat$GPP_U95_f < 0)
+      # dat$GPP_U95_f[inegGPP] <- 0
+      # dat$Reco_U95[inegGPP] <- dat$NEE_U95_f[inegGPP]
     }
 
     

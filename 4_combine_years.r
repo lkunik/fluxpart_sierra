@@ -8,6 +8,21 @@ setwd(dirname(sys.frame(1)$ofile))
 source("config.r")
 
 
+#ggplot format function
+legend_theme <- function() {
+  theme(
+    legend.title=element_blank(),
+    legend.text=element_text(size=10,color="black"),
+    legend.background=element_rect(fill = "white", color = "black"),
+    legend.key=element_blank(),
+    legend.key.size=unit(1,"lines"),
+    #legend.spacing.y=unit(0.1, "cm"),
+    legend.position=c(0.87, 0.2),
+  )
+}
+
+
+
 #########################################
 # Begin main
 #########################################
@@ -84,47 +99,55 @@ for(site in site.list){
   # NEE, GPP, Reco
   grob <- site.df %>% # take data
     ggplot() + theme_FS() + # pipe in ggplot call
-    geom_point(aes(x=posix_time, y=NEE_U50_f), size=0.5, color = "gray50") + # plot NEE vs time
-    geom_point(aes(x=posix_time, y=GPP_U50_f), size = 0.5, color = "red") + # add GPP vs time
-    geom_point(aes(x=posix_time, y=Reco_U50), size = 0.5, color = "blue") + # add Respiration vs time
+    geom_point(aes(x=posix_time, y=NEE_U50_f, color = "gray50"), size=0.5) + # plot NEE vs time
+    geom_point(aes(x=posix_time, y=GPP_U50_f, color = "red"), size = 0.5) + # add GPP vs time
+    geom_point(aes(x=posix_time, y=Reco_U50, color = "blue"), size = 0.5) + # add Respiration vs time
     ylim(ylims) +
     xlab("") + scale_x_datetime(labels = label_date("%b %Y")) +
     ylab("[umol m-2 s-1]") +
-    ggtitle(site)
+    ggtitle(site) +
+    legend_theme() +
+    scale_color_identity(breaks = c("gray50", "red", "blue"), 
+                         labels = c("NEE", "GPP", "Reco"), guide = "legend")
   
   grob.list.all[[site]] <- grob
   
   # NEE, weekly GPP, weekly Reco
   grob <- site.df %>% # take data
     ggplot() + theme_FS() + # pipe in ggplot call
-    geom_point(data = weekly.df, aes(x=mean_posix, y=weekly_NEE),  size = 0.75, color = "gray50") + # add NEE vs time
-    geom_line(data = weekly.df, aes(x=mean_posix, y=weekly_NEE), size = 0.75, color = "gray50") + # add NEE vs time
-    geom_point(data = weekly.df, aes(x=mean_posix, y=weekly_GPP),  size = 0.75, color = "red", alpha = 0.5) + # add GPP vs time
-    geom_line(data = weekly.df, aes(x=mean_posix, y=weekly_GPP), size = 0.75, color = "red", alpha = 0.5) + # add GPP vs time
-    geom_point(data = weekly.df, aes(x=mean_posix, y=weekly_Reco), size = 0.75, color = "blue", alpha = 0.5) + # add Reco vs time
-    geom_line(data = weekly.df, aes(x=mean_posix, y=weekly_Reco), size = 0.75, color = "blue", alpha = 0.5) + # add Reco vs time
+    geom_point(data = weekly.df, aes(x=mean_posix, y=weekly_NEE, color = "gray50"),  size = 0.75) + # add NEE vs time
+    geom_line(data = weekly.df, aes(x=mean_posix, y=weekly_NEE, color = "gray50"), size = 0.75) + # add NEE vs time
+    geom_point(data = weekly.df, aes(x=mean_posix, y=weekly_GPP, color = "red"),  size = 0.75, alpha = 0.5) + # add GPP vs time
+    geom_line(data = weekly.df, aes(x=mean_posix, y=weekly_GPP, color = "red"), size = 0.75, alpha = 0.5) + # add GPP vs time
+    geom_point(data = weekly.df, aes(x=mean_posix, y=weekly_Reco, color = "blue"), size = 0.75, alpha = 0.5) + # add Reco vs time
+    geom_line(data = weekly.df, aes(x=mean_posix, y=weekly_Reco, color = "blue"), size = 0.75, alpha = 0.5) + # add Reco vs time
     ylim(c(-6, 6)) +
     xlab("") + scale_x_datetime(labels = label_date("%b %Y")) +
     ylab("[umol m-2 s-1]") +
-    ggtitle(site)
+    ggtitle(site) +
+    legend_theme() +
+    scale_color_identity(breaks = c("gray50", "red", "blue"), 
+                         labels = c("NEE", "GPP", "Reco"), guide = "legend")
   
   grob.list.all.weekly[[site]] <- grob
   
   # Just NEE
   grob <- site.df %>% # take data
     ggplot() + theme_FS() + # pipe in ggplot call
-    geom_point(aes(x=posix_time, y=NEE_U50_f), size=0.5, color = "gray50") + # plot NEE vs time
+    geom_point(aes(x=posix_time, y=NEE_U50_f, color = "gray50"), size=0.5) + # plot NEE vs time
     ylim(ylims) +
     xlab("") + scale_x_datetime(labels = label_date("%b %Y")) +
     ylab("[umol m-2 s-1]") +
-    ggtitle(site)
+    ggtitle(site) +
+    legend_theme() +
+    scale_color_identity(breaks = c("gray50"), labels = c("NEE"), guide = "legend")
   
   grob.list.nee[[site]] <- grob
 }
 
 gridRows <- ceiling(length(site.list)/2)
 gridCols <- 2
-main.title <- "NEE (gray) & calculated GPP (red), Reco (blue), All available years, 50% u* threshold"
+main.title <- "Half-hourly partitioned fluxes at AMF & NEON sites\n(derived using 50% u* threshold)"
 
 #print PNG
 
@@ -136,7 +159,7 @@ grid.arrange(grobs = grob.list.all, nrow = gridRows, ncols = gridCols,
 dev.off() #close pdf
 
 
-main.title <- "NEE (gray) & calculated GPP (red), Reco (blue), All available years, 50% u* threshold"
+main.title <- "Weekly partitioned fluxes at AMF & NEON sites\n(derived using 50% u* threshold)"
 
 # HH NEE, weekly GPP, weekly Reco
 png_outfile <- paste0(plot.dir, "flux_all_sites_all_years_weekly.png") #define plot filename
@@ -146,7 +169,7 @@ grid.arrange(grobs = grob.list.all.weekly, nrow = gridRows, ncols = gridCols,
 dev.off() #close pdf
 
 # Now plot just NEE
-main.title <- "NEE - All available years, 50% u* threshold"
+main.title <- "Half-hourly net ecosystem exchange (NEE) at AMF & NEON sites\n(derived using 50% u* threshold)"
 
 png_outfile <- paste0(plot.dir, "NEE_all_sites_all_years.png") #define plot filename
 png(png_outfile, width = 800, height = 1000) #open pdf
