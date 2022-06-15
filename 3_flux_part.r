@@ -73,7 +73,7 @@ for(site in site.list){
       DoY_window <- seq(day - window_buff, day + window_buff)
       dat.window <- dat.night %>%
         filter(DoY %in% DoY_window) %>%
-        select(any_of(window.vars))
+        dplyr::select(any_of(window.vars))
       
       if(nrow(dat.window) == 0)
         next

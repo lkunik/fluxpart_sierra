@@ -7,8 +7,8 @@ setwd(dirname(sys.frame(1)$ofile))
 # Set toggle - plot the extra goodies? T/F
 
 
-source("1_prep_data.r")
-source("2_get_E0_vals.r")
+#source("1_prep_data.r")
+#source("2_get_E0_vals.r")
 source("3_flux_part.r")
 source("4_combine_years.r")
 source("5_plot_Rref_E0.r")
