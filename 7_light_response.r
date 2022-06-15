@@ -95,7 +95,7 @@ for(site in site.list){
     
     
     flux.df %<>%
-      select(any_of(LR_cols)) #select columns we need for this function
+      dplyr::select(any_of(LR_cols)) #select columns we need for this function
     
     ylims <- c(-10, 5) #set y axis limits
     
