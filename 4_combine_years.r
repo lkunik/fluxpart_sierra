@@ -53,6 +53,7 @@ for(site in site.list){
       bind_rows(flux.df)
   }
   
+  #stop()
   year1 <- head(site.df$Year, 1)
   yearn <- tail(site.df$Year, 1)
   filename <- paste0(data.case, site, "_flux_part_s", year1, "-", yearn, "_df.rds")

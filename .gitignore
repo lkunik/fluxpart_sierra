@@ -5,3 +5,4 @@ plots/*
 .Rhistory
 .RDataTmp
 8*.r
+tmp*.r

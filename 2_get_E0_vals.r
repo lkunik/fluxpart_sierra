@@ -75,10 +75,15 @@ for(site in site.list){
       DoY_window <- seq(day - window_buff, day + window_buff)
       dat.window <- dat.night %>%
         filter(DoY %in% DoY_window) %>%
-        select(any_of(window.vars))
+        dplyr::select(any_of(window.vars))
       
-      if(nrow(dat.window) == 0)
+      if(nrow(dat.window) == 0){
+        # message(paste0("Data in 2-week window is empty, skipping to next day. File = ", file,
+        #                ", DoY Window = ", min(DoY_window), "-",
+        #                max(DoY_window)))
         next
+      }
+        
       
       x <- dat.window$Tair_K #grab your "x variable", i.e. input to Reco function
       y05 <- dat.window$NEE_U05_f #grab your "y variable", i.e. output to Reco function
@@ -94,8 +99,13 @@ for(site in site.list){
       # If percent utility is <10%, let's consider the data to be too sparse to 
       # determine meaningful model parameters for this window. Skip this 7-day window.
       # Also skip if there is NEE data but no Temp data (does happen sometimes)
-      if(perc_util < 10 | all(is.na(x)))
+      if(perc_util < 10 | all(is.na(x))){
+        # message(paste0("Data in 2-week window too sparse, skipping to next day. File = ", file,
+        #                ", DoY Window = ", min(DoY_window), "-",
+        #                max(DoY_window)))
         next
+      }
+        
       
       if(!all(is.na(y05))){
         # run first round of model and assign to object
@@ -137,8 +147,12 @@ for(site in site.list){
       
       if(!all(is.na(y50))){
         # run first round of model and assign to object
+        
+
         mod50_primer <- minpack.lm::nlsLM(y50 ~ fNight_Reichstein(Temp = x, Rref, Tref = Tref_K,
-                        T0 = T0_K, E0), start = list(Rref = 1, E0 = 100), model = TRUE)
+                                         T0 = T0_K, E0), start = list(Rref = 1, E0 = 100),
+                                          model = TRUE)
+        
         mod50_resid <- resid(mod50_primer)
         
         # Trim the first round of model to exclude upper and lower 5% of residuals

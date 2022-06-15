@@ -38,13 +38,13 @@ fNight_Reichstein <- function(Temp, Rref, Tref, T0, E0) {
 #ggplot format function
 theme_LK <- function() {
   theme(
-    plot.title = element_text(color="black", hjust = 0.5, size=14, face="bold"),
+    plot.title = element_text(color="black", hjust = 0.5, size=12, face="bold"),
     plot.subtitle = element_text(color="black", hjust = 0.5, size=12),
     axis.line=element_line(size=0.75),
     axis.title.x=element_text(size=15,color="black"),
-    axis.text.x=element_text(size=12,color="black"),
+    axis.text.x=element_text(size=13,color="black"),
     axis.title.y=element_text(size=15,color="black"),
-    axis.text.y=element_text(size=12,color="black"),
+    axis.text.y=element_text(size=14,color="black"),
     #legend.title=element_text(size=12,color="black"),
     legend.title=element_blank(),
     #legend.title.align = 0.5,
@@ -70,14 +70,20 @@ theme_LK <- function() {
 
 # list of sites to partition fluxes for:
 #site.list <- c("AMF_US-NR1")
-site.list <- c("AMF_US-CZ2", "AMF_US-CZ3", "AMF_US-CZ4", "NEO_SJER", "NEO_SOAP", 
-               "NEO_TEAK", "AMF_US-NR1")
+site.list.meta <- c("AMF_US-CZ2", "AMF_US-CZ3", "AMF_US-CZ4", "NEO_SJER", "NEO_SOAP", 
+              "NEO_TEAK", "AMF_US-NR1")
+site.elevs.meta <- c(1160, 2015, 2700, 405, 1160, 2147, 3050) #in meters
+
+site.list <- c("NEO_SJER", "NEO_SOAP", "NEO_TEAK", "AMF_US-NR1")
+
+
 
 ### Root dir path
 caseroot <- "./"
 
 # location of input data 
-data.dir <- "/Users/lkunik/Documents/Eddy_Covariance/Kenny_code/1_Processed data/2_Output_from_ProcessingThruREddyProc/1_REddyProc outputs/1_after-night-part/" #failed REddyProc files which have gap-filled NEE, etc
+#data.dir <- "/Users/lkunik/Documents/Eddy_Covariance/Kenny_code/1_Processed data/2_Output_from_ProcessingThruREddyProc/1_REddyProc outputs/1_after-night-part/" #failed REddyProc files which have gap-filled NEE, etc
+data.dir <- "/Users/lkunik/Documents/Eddy_Covariance/FluxSynthU/1_Processed data/2_Output_from_ProcessingThruREddyProc/1_REddyProc outputs/1_after-night-part/" #failed REddyProc files which have gap-filled NEE, etc
 data.dir.compare <- "/Users/lkunik/Library/CloudStorage/Box-Box/FLUXNET synthesis/Kenny/KS_FluxSynth_v8.0/1_Processed data/2_Output_from_ProcessingThruREddyProc/1_REddyProc outputs/1_after-night-part/" #successful REddyProc files for select sites (using for NWR to compare)
 
 # Location of processed data saved during Step 1 (accessed in most scripts that follow)
@@ -91,14 +97,15 @@ data.E0.case <- paste0(caseroot, "data/E0/")
 
 # location of plot output
 plot.dir <- paste0(caseroot, "plots/") #location of output plots
+ggobj.dir <- paste0(plot.dir, "ggplot_objects/") #location of ggplot objects
 
 # Define the additional Mike Goulden files that contain PAR (for determining nighttime data)
-PAR.files <- c(paste0(caseroot, "include/SolRad_US-CZ2.nc"),
-               paste0(caseroot, "include/SolRad_US-CZ3.nc"),
-               paste0(caseroot, "include/SolRad_US-CZ4.nc"),
-               NA, NA, NA, NA)
-
-names(PAR.files) <- site.list
+PAR.files.orig <- c(paste0(caseroot, "include/SolRad_US-CZ2.nc"),
+                    paste0(caseroot, "include/SolRad_US-CZ3.nc"),
+                    paste0(caseroot, "include/SolRad_US-CZ4.nc"),
+                    NA, NA, NA, NA)
+names(PAR.files.orig) <- site.list.meta
+PAR.files <- sapply(site.list, FUN = function(x) PAR.files.orig[[x]])
 
 
 
